@@ -31,30 +31,33 @@ public abstract class AbstractHasValue<T> implements HasValue<T>, Signal<T>, Sin
     ValueChangeEvent.fire(this, getValue());
   }
 
+  @Override
+  public void destroy() { }
+
   public static <T> AbstractHasValue<T> create(Source<T> source, Sink<T> sink) {
     return new Impl<T>(source, sink);
   }
 
   private static class Impl<T> extends AbstractHasValue<T> {
 
-      final Source<T> source;
-      final Sink<T> sink;
+    final Source<T> source;
+    final Sink<T> sink;
 
-      Impl(Source<T> source, Sink<T> sink) {
-        this.source = source;
-        this.sink = sink;
-      }
-
-      @Override
-      public T getValue() {
-        return source.getValue();
-      }
-
-      @Override
-      public void setValue(T value) {
-        sink.setValue(value);
-      }
-
+    Impl(Source<T> source, Sink<T> sink) {
+      this.source = source;
+      this.sink = sink;
     }
+
+    @Override
+    public T getValue() {
+      return source.getValue();
+    }
+
+    @Override
+    public void setValue(T value) {
+      sink.setValue(value);
+    }
+
+  }
 
 }

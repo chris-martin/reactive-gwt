@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -14,6 +15,7 @@ import com.google.gwt.user.client.ui.HasValue;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 
 public final class Signals {
 
@@ -24,7 +26,7 @@ public final class Signals {
 
     SignalImpl<T> signal = new SignalImpl<T>(source);
     for (HasValueChangeHandlers<T> x : xs) {
-      x.addValueChangeHandler(signal.valueChangeHandler);
+      signal.handlerRegistrations.add(x.addValueChangeHandler(signal.valueChangeHandler));
     }
     return signal;
   }
@@ -75,7 +77,6 @@ public final class Signals {
   };
 
   public static Signal<Boolean> not(Signal<Boolean> signal) {
-
     return transform(signal, not);
   }
 
@@ -87,17 +88,14 @@ public final class Signals {
   };
 
   public static Signal<Boolean> or(Iterable<Signal<Boolean>> signals) {
-
     return compose(signals, Sources.or());
   }
 
   public static Signal<Boolean> and(Iterable<Signal<Boolean>> signals) {
-
     return compose(signals, Sources.and());
   }
 
   public static Signal<Boolean> emptyString(Signal<String> stringSignal) {
-
     return transform(stringSignal, emptyString);
   }
 
@@ -124,8 +122,8 @@ public final class Signals {
   private static class SignalImpl<T> implements Signal<T> {
 
     final HandlerManager handlerManager = new HandlerManager(this);
-
     final Source<T> source;
+    List<HandlerRegistration> handlerRegistrations = Lists.newArrayList();
 
     final ValueChangeHandler<T> valueChangeHandler = new ValueChangeHandler<T>() {
       @Override
@@ -151,6 +149,17 @@ public final class Signals {
     @Override
     public T getValue() {
       return source.getValue();
+    }
+
+    @Override
+    public void destroy() {
+      if (handlerRegistrations == null) {
+        throw new IllegalStateException("Signal has already been destroyed");
+      }
+      for (HandlerRegistration registration : handlerRegistrations) {
+        registration.removeHandler();
+      }
+      handlerRegistrations = null;
     }
 
   }
