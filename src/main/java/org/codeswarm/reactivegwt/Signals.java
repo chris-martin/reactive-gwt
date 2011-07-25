@@ -1,7 +1,9 @@
 package org.codeswarm.reactivegwt;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -27,56 +29,95 @@ public final class Signals {
     return signal;
   }
 
-  public static <T> Signal<T> hasValueSignal(HasValue<T> hasValue) {
+  public static <T> Signal<T> valueOf(HasValue<T> hasValue) {
 
-    return create(Sources.fromTakesValue(hasValue), ImmutableList.of(hasValue));
+    return create(Sources.valueOf(hasValue), ImmutableList.of(hasValue));
   }
 
   public static <F, T> Signal<T> transform(
-      Signal<F> from,
-      Function<? super F, ? extends T> transformation) {
+      Signal<F> from, Function<? super F, ? extends T> transformation) {
 
     return create(Sources.transform(from, transformation), ImmutableList.of(from));
   }
 
-  public static <T> Signal<T> compose(Source.Composition<T> composer,
-                                      Iterable<Signal<T>> signals) {
+  public static <F> Signal<Boolean> transform(
+      Signal<F> from, final Predicate<? super F> predicate) {
 
-    return create(composer.compose(signals), signals);
+    return transform(from, new Function<F, Boolean>() {
+      @Override
+      public Boolean apply(@Nullable F f) {
+        return predicate.apply(f);
+      }
+    });
   }
+
+  @SuppressWarnings("unchecked")
+  public static <T> Signal<T> compose(
+      Iterable<Signal<T>> signals,
+      final Function<Iterable<? extends T>, T> composition) {
+
+    final Iterable<T> values = Iterables.transform(signals, (Function) getSourceValue);
+    Source<T> source = new Source<T>() {
+      @Override
+      public T getValue() {
+        return composition.apply(values);
+      }
+    };
+    return create(source, signals);
+  }
+
+  private static final Function<? extends Source<?>, Object> getSourceValue =
+      new Function<Source<?>, Object>() {
+    @Override
+    public Object apply(@Nullable Source<?> input) {
+      return input == null ? null : input.getValue();
+    }
+  };
+
+  public static Signal<Boolean> not(Signal<Boolean> signal) {
+
+    return transform(signal, not);
+  }
+
+  private static final Function<Boolean, Boolean> not = new Function<Boolean, Boolean>() {
+    @Override
+    public Boolean apply(@Nullable Boolean input) {
+      return input == null ? null : !input;
+    }
+  };
 
   public static Signal<Boolean> or(Iterable<Signal<Boolean>> signals) {
 
-    return compose(Sources.or(), signals);
+    return compose(signals, Sources.or());
   }
 
   public static Signal<Boolean> and(Iterable<Signal<Boolean>> signals) {
 
-    return compose(Sources.and(), signals);
+    return compose(signals, Sources.and());
   }
 
-  public static Signal<Boolean> nonEmptyString(HasValue<String> hasStringValue) {
+  public static Signal<Boolean> emptyString(Signal<String> stringSignal) {
 
-    return transform(hasValueSignal(hasStringValue), nonEmptyString);
+    return transform(stringSignal, emptyString);
   }
 
-  public static Signal<Boolean> nonEmptyCollection(
-      HasValue<? extends Collection> hasCollectionValue) {
-
-    return transform(hasValueSignal(hasCollectionValue), nonEmptyCollection);
-  }
-
-  private static final Function<String, Boolean> nonEmptyString = new Function<String, Boolean>() {
+  private static final Predicate<String> emptyString = new Predicate<String>() {
     @Override
-    public Boolean apply(@Nullable String value) {
-      return value != null && value.length() != 0;
+    public boolean apply(@Nullable String value) {
+      return value == null || value.length() == 0;
     }
   };
 
-  private static final Function<Collection, Boolean> nonEmptyCollection = new Function<Collection, Boolean>() {
+  public static Signal<Boolean> emptyCollection(
+      Signal<? extends Collection> collectionSignal) {
+
+    return transform(collectionSignal, emptyCollection);
+  }
+
+  private static final Predicate<Collection> emptyCollection = new Predicate<Collection>() {
     @Override
-    public Boolean apply(@Nullable Collection value) {
-      return value != null && value.size() != 0;
+    public boolean apply(@Nullable Collection value) {
+      return value == null || value.size() != 0;
     }
   };
 
