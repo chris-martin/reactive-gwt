@@ -9,6 +9,18 @@
   <artifactId>reactive-gwt</artifactId>
   <version>1.0</version>
 
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>https://github.com/codeswarm/reactive-gwt</url>
+  </scm>
+
   <dependencies>
 
     <dependency>
