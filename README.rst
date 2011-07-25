@@ -7,7 +7,7 @@ with Google Web Toolkit.
 AbstractHasValue<T>
 -------------------
 
-The standard GWT way to implement HasValue<T>_ is to extend Widget_
+The standard GWT way to implement HasValue_ is to extend Widget_
 (usually Composite_), which provides ``fireEvent(GwtEvent<?>):void``
 (required by HasHandlers_, a supertype of HasValue).
 If you want to design a widget that has more than one piece of observable state,
