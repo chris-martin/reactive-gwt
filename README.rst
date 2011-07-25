@@ -95,7 +95,7 @@ text boxes, separated by commas::
  ).addValueChangeHandler(ValueChangeHandlers.setText(label));
 
 .. _`reactive programming`: http://en.wikipedia.org/wiki/Reactive_programming
-.. _HasValue<T>: http://google-web-toolkit.googlecode.com/svn/javadoc/latest/com/google/gwt/user/client/ui/HasValue.html
+.. _HasValue: http://google-web-toolkit.googlecode.com/svn/javadoc/latest/com/google/gwt/user/client/ui/HasValue.html
 .. _Widget: http://google-web-toolkit.googlecode.com/svn/javadoc/latest/com/google/gwt/user/client/ui/Widget.html
 .. _Composite: http://google-web-toolkit.googlecode.com/svn/javadoc/latest/com/google/gwt/user/client/ui/Composite.html
 .. _HasHandlers: http://google-web-toolkit.googlecode.com/svn/javadoc/latest/com/google/gwt/event/shared/HasHandlers.html
