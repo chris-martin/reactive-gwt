@@ -44,7 +44,7 @@ This is very similar to HasValue.
 The difference is that the Signal interface does *not* not have methods that mutate its state.
 This allows us to derive signals from other signals.
 The main purpose of Reactive GWT is to support Signal composition,
-because it is an incredibly useful and intuitive concept,
+because it is an incredibly useful and intuitive concept.
 
 Example 1: Boolean signal composition
 -------------------------------------
