@@ -54,7 +54,7 @@ public final class Signals {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> Signal<T> compose(
+  public static <T> Signal<T> merge(
       Iterable<Signal<T>> signals,
       final Function<Iterable<? extends T>, T> composition) {
 
@@ -88,11 +88,11 @@ public final class Signals {
   };
 
   public static Signal<Boolean> or(Iterable<Signal<Boolean>> signals) {
-    return compose(signals, Sources.or());
+    return merge(signals, Sources.or());
   }
 
   public static Signal<Boolean> and(Iterable<Signal<Boolean>> signals) {
-    return compose(signals, Sources.and());
+    return merge(signals, Sources.and());
   }
 
   public static Signal<Boolean> emptyString(Signal<String> stringSignal) {

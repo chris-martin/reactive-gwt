@@ -74,7 +74,7 @@ by Reactive GWT, but you can also compose values using your own functions.
 Suppose you want the label to always display the contents of the nonempty
 text boxes, separated by commas::
 
- Signals.compose(
+ Signals.merge(
    ImmutableList.of(
      Signals.valueOf(textBox1),
      Signals.valueOf(textBox2),
