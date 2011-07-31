@@ -88,11 +88,11 @@ public final class Signals {
   };
 
   public static Signal<Boolean> or(Iterable<Signal<Boolean>> signals) {
-    return merge(signals, Sources.or());
+    return merge(signals, MergeFunctions.or());
   }
 
   public static Signal<Boolean> and(Iterable<Signal<Boolean>> signals) {
-    return merge(signals, Sources.and());
+    return merge(signals, MergeFunctions.and());
   }
 
   public static Signal<Boolean> emptyString(Signal<String> stringSignal) {
