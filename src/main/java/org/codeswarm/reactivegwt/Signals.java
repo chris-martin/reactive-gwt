@@ -53,6 +53,20 @@ public final class Signals {
     return create(Sources.transform(from, transformation), ImmutableList.of(from));
   }
 
+  public static <F, T> Iterable<Signal<T>> transform(
+      Iterable<Signal<F>> from, final Function<? super F, ? extends T> transformation) {
+
+    return Iterables.transform(
+      from,
+      new Function<Signal<F>, Signal<T>>() {
+        @Override
+        public Signal<T> apply(Signal<F> signal) {
+          return transform(signal, transformation);
+        }
+      }
+    );
+  }
+
   public static <F> Signal<Boolean> transform(
       Signal<F> from, final Predicate<? super F> predicate) {
 
@@ -62,6 +76,20 @@ public final class Signals {
         return predicate.apply(f);
       }
     });
+  }
+
+  public static <F> Iterable<Signal<Boolean>> transform(
+      Iterable<Signal<F>> from, final Predicate<? super F> predicate) {
+
+    return Iterables.transform(
+      from,
+      new Function<Signal<F>, Signal<Boolean>>() {
+        @Override
+        public Signal<Boolean> apply(Signal<F> signal) {
+          return transform(signal, predicate);
+        }
+      }
+    );
   }
 
   @SuppressWarnings("unchecked")
@@ -88,47 +116,34 @@ public final class Signals {
   };
 
   public static Signal<Boolean> not(Signal<Boolean> signal) {
-    return transform(signal, not);
+    return transform(signal, Functions.not);
   }
 
-  private static final Function<Boolean, Boolean> not = new Function<Boolean, Boolean>() {
-    @Override
-    public Boolean apply(@Nullable Boolean input) {
-      return input == null ? null : !input;
-    }
-  };
-
   public static Signal<Boolean> or(Iterable<Signal<Boolean>> signals) {
-    return merge(signals, MergeFunctions.or());
+    return merge(signals, Functions.or());
+  }
+
+  public static Signal<Boolean> or(Signal<Boolean> ... signals) {
+    return or(ImmutableList.copyOf(signals));
   }
 
   public static Signal<Boolean> and(Iterable<Signal<Boolean>> signals) {
-    return merge(signals, MergeFunctions.and());
+    return merge(signals, Functions.and());
+  }
+
+  public static Signal<Boolean> and(Signal<Boolean> ... signals) {
+    return and(ImmutableList.copyOf(signals));
   }
 
   public static Signal<Boolean> emptyString(Signal<String> stringSignal) {
-    return transform(stringSignal, emptyString);
+    return transform(stringSignal, Predicates.emptyString);
   }
-
-  private static final Predicate<String> emptyString = new Predicate<String>() {
-    @Override
-    public boolean apply(@Nullable String value) {
-      return value == null || value.length() == 0;
-    }
-  };
 
   public static Signal<Boolean> emptyCollection(
       Signal<? extends Collection> collectionSignal) {
 
-    return transform(collectionSignal, emptyCollection);
+    return transform(collectionSignal, Predicates.emptyCollection);
   }
-
-  private static final Predicate<Collection> emptyCollection = new Predicate<Collection>() {
-    @Override
-    public boolean apply(@Nullable Collection value) {
-      return value == null || value.size() != 0;
-    }
-  };
 
   private static class SignalImpl<T> implements Signal<T> {
 

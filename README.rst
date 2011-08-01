@@ -49,46 +49,35 @@ because it is an incredibly useful and intuitive concept.
 Example 1: Boolean signal composition
 -------------------------------------
 
-Suppose you have a CheckBox_, three TextBox_ widgets, and a Label_.
+Suppose you have a CheckBox_, a list of TextBox_ widgets, and a Label_.
 The label needs to be visible only when the checkbox is checked and at least
 one of the text boxes is nonempty.
 This can be expressed naturally by declaring the label's visibility change as a reaction
 to the composite state of the other widgets::
 
- import static org.codeswarm.reactivegwt.Signals.*;
- ...
- and(ImmutableList.of(
-   valueOf(checkBox),
-   or(ImmutableList.of(
-     not(emptyString(valueOf(textBox1))),
-     not(emptyString(valueOf(textBox2))),
-     not(emptyString(valueOf(textBox3)))
-   ))
- )).addValueChangeHandler(ValueChangeHandlers.setVisible(label));
+ // Represent the checkbox's value as a boolean signal
+ Signal<Boolean> boxIsChecked = Signals.valueOf(checkBox);
+
+ // Create a signal indicating whether each text box is nonempty, then
+ // OR them to get a signal that is true when any of them are nonempty
+ Signal<Boolean> anyTextBoxesAreFilled = Signals.or(Signals.transform(
+   Signals.valueOf(textBoxes), Functions.not(Predicates.emptyString)));
+
+ // Declare that the label is visible exactly when both of these signals are true
+ Signals.and(boxIsChecked, anyTextBoxesAreFilled)
+   .addValueChangeHandler(ValueChangeHandlers.setVisible(label));
 
 Example 2: String signal composition
 ------------------------------------
 
-Example 1 demonstrated some of the commonly-used composition operations supported
-by Reactive GWT, but you can also compose values using your own functions.
-Suppose you want the label to always display the contents of the nonempty
-text boxes, separated by commas::
+Example 1 demonstrated some of the commonly-used composition
+operations directly supported by the Signals class (such as and/or).
+You can also merge signals using arbitrary functions.
+Suppose you want the label to always display the contents of the
+nonempty text boxes, separated by commas::
 
- Signals.merge(
-   Signals.valueOf(ImmutableList.of(textBox1, textBox2, textBox3)),
-   new MergeFunction<String, String>() {
-     public String apply(Iterable<? extends String> values) {
-       return Joiner.on(", ").join(removeEmptyStrings(values));
-     }
-     Iterable<? extends String> removeEmptyStrings(Iterable<? extends String> values) {
-       return Iterables.filter(values, new Predicate<String>() {
-         public boolean apply(String value) {
-           return value.length() != 0;
-         }
-       });
-     }
-   }
- ).addValueChangeHandler(ValueChangeHandlers.setText(label));
+ Signals.merge(Signals.valueOf(textBoxes), Functions.join(", "))
+   .addValueChangeHandler(ValueChangeHandlers.setText(label));
 
 .. _`reactive programming`: http://en.wikipedia.org/wiki/Reactive_programming
 .. _HasValue: http://google-web-toolkit.googlecode.com/svn/javadoc/latest/com/google/gwt/user/client/ui/HasValue.html
