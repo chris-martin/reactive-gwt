@@ -36,6 +36,17 @@ public final class Signals {
     return create(Sources.valueOf(hasValue), ImmutableList.of(hasValue));
   }
 
+  public static <T> Iterable<Signal<T>> valueOf(
+      Iterable<? extends HasValue<T>> hasValues) {
+
+    return Iterables.transform(hasValues, new Function<HasValue<T>, Signal<T>>() {
+      @Override
+      public Signal<T> apply(HasValue<T> hasValue) {
+        return valueOf(hasValue);
+      }
+    });
+  }
+
   public static <F, T> Signal<T> transform(
       Signal<F> from, Function<? super F, ? extends T> transformation) {
 

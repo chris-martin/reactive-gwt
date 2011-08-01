@@ -55,16 +55,16 @@ one of the text boxes is nonempty.
 This can be expressed naturally by declaring the label's visibility change as a reaction
 to the composite state of the other widgets::
 
- import static Signals.*;
+ import static org.codeswarm.reactivegwt.Signals.*;
  ...
- and(
+ and(ImmutableList.of(
    valueOf(checkBox),
-   or(
+   or(ImmutableList.of(
      not(emptyString(valueOf(textBox1))),
      not(emptyString(valueOf(textBox2))),
      not(emptyString(valueOf(textBox3)))
-   )
- ).addValueChangeHandler(ValueChangeHandlers.setVisible(label));
+   ))
+ )).addValueChangeHandler(ValueChangeHandlers.setVisible(label));
 
 Example 2: String signal composition
 ------------------------------------
@@ -75,12 +75,8 @@ Suppose you want the label to always display the contents of the nonempty
 text boxes, separated by commas::
 
  Signals.merge(
-   ImmutableList.of(
-     Signals.valueOf(textBox1),
-     Signals.valueOf(textBox2),
-     Signals.valueOf(textBox3)
-   ),
-   new Function<Iterable<? extends String>, String>() {
+   Signals.valueOf(ImmutableList.of(textBox1, textBox2, textBox3)),
+   new MergeFunction<String, String>() {
      public String apply(Iterable<? extends String> values) {
        return Joiner.on(", ").join(removeEmptyStrings(values));
      }
