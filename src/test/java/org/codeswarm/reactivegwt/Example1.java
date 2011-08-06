@@ -1,23 +1,21 @@
 package org.codeswarm.reactivegwt;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
-import org.testng.annotations.BeforeMethod;
-import org.testng.collections.Lists;
 
 import java.util.List;
 
 import static org.codeswarm.reactivegwt.Signals.*;
 
-public class Example1 {
+public class Example1 extends Test {
 
   CheckBox checkBox;
   List<TextBox> textBoxes;
   Label label;
 
-  @BeforeMethod
-  public void setUp() throws Exception {
+  public void test() throws Exception {
     checkBox = new CheckBox();
     textBoxes = Lists.newArrayList();
     for (int i = 0; i < 3; ++i) textBoxes.add(new TextBox());

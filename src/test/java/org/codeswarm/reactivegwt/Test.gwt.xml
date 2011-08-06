@@ -1,0 +1,4 @@
+<module>
+  <inherits name="org.codeswarm.reactivegwt.Reactive"/>
+  <source path=""/>
+</module>
