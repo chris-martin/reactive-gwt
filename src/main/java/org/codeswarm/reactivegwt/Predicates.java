@@ -1,5 +1,6 @@
 package org.codeswarm.reactivegwt;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 
 import javax.annotation.Nullable;
@@ -24,5 +25,16 @@ public final class Predicates {
       return value == null || value.size() != 0;
     }
   };
+
+  public static <T> Predicate<T> forFunction(
+      final Function<T, Boolean> function) {
+
+    return new Predicate<T>() {
+      @Override
+      public boolean apply(@Nullable T t) {
+        return function.apply(t);
+      }
+    };
+  }
 
 }

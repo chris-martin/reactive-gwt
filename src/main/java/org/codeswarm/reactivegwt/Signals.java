@@ -145,6 +145,13 @@ public final class Signals {
     return transform(collectionSignal, Predicates.emptyCollection);
   }
 
+  public static <T> HandlerRegistration connect(Signal<T> signal, Sink<T> sink) {
+    HandlerRegistration handlerRegistration =
+      signal.addValueChangeHandler(Sinks.valueChangeHandler(sink));
+    sink.setValue(signal.getValue());
+    return handlerRegistration;
+  }
+
   private static class SignalImpl<T> implements Signal<T> {
 
     final HandlerManager handlerManager = new HandlerManager(this);

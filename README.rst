@@ -64,8 +64,8 @@ to the composite state of the other widgets::
    Signals.valueOf(textBoxes), Functions.not(Predicates.emptyString)));
 
  // Declare that the label is visible exactly when both of these signals are true
- Signals.and(boxIsChecked, anyTextBoxesAreFilled)
-   .addValueChangeHandler(ValueChangeHandlers.setVisible(label));
+ Signal<Boolean> labelIsVisible = Signals.and(boxIsChecked, anyTextBoxesAreFilled);
+ Signals.connect(labelIsVisible, Sinks.setVisible(label));
 
 Example 2: String signal composition
 ------------------------------------
@@ -76,8 +76,10 @@ You can also merge signals using arbitrary functions.
 Suppose you want the label to always display the contents of the
 nonempty text boxes, separated by commas::
 
- Signals.merge(Signals.valueOf(textBoxes), Functions.join(", "))
-   .addValueChangeHandler(ValueChangeHandlers.setText(label));
+ MergeFunction<String, String> mergeFunction = Functions.filterThenMerge(
+   Functions.not(Predicates.emptyString), Functions.join(", "));
+ Signal<String> labelText = Signals.merge(Signals.valueOf(textBoxes), mergeFunction);
+ Signals.connect(labelText, Sinks.setText(label));
 
 .. _`reactive programming`: http://en.wikipedia.org/wiki/Reactive_programming
 .. _HasValue: http://google-web-toolkit.googlecode.com/svn/javadoc/latest/com/google/gwt/user/client/ui/HasValue.html

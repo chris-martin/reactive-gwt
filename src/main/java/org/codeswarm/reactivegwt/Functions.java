@@ -20,6 +20,22 @@ public final class Functions {
     }
   };
 
+  public static <F, T> MergeFunction<F, T> filterThenMerge(
+      final Predicate<F> predicate, final MergeFunction<F, T> merge) {
+
+    return new MergeFunction<F, T>() {
+      @Override
+      public T apply(Iterable<? extends F> iterable) {
+        return merge.apply(Iterables.filter(iterable, predicate));
+      }
+    };
+  }
+
+  public static <F, T> MergeFunction<F, T> filterThenMerge(
+      final Function<F, Boolean> function, final MergeFunction<F, T> merge) {
+    return filterThenMerge(Predicates.forFunction(function), merge);
+  }
+
   public static <F> Function<F, Boolean> not(
       final Function<F, Boolean> function) {
 
